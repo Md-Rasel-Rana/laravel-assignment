@@ -4,40 +4,68 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use DB;
 
 class UserController extends Controller
 {
-  
-//        public function index(Request $request){
-//            $data=[
-//               1=>['name'=>'james1','email'=> 'info1@gmail.com','password'=> 'rasel127'],
-//               2=> ['name'=>'james2','email'=> 'info2@gmail.com','password'=> 'rasel128'],
-//               3=>['name'=>'james3','email'=> 'info3@gmail.com','password'=> 'rasel129'],
-//            ];
-      
-//         return view("blog")->with('userdata', $data);
-//        }    
-//     public function showdata($id){
-//        return "user: $id";
-
-// }
-  
-
-
 public function index(Request $request){
- 
-       return view("blog");
+      $user = DB::table("studentsinfo")->get();
+
+  
+      return view("pages.trail",compact("user"));
+}
+public function create(Request $request){
+     
+      return view("pages.form");
 }
 public function store(Request $request){
-      $validated = $request->validate([
+      $validatedData = $request->validate([
             'name' => 'required',
-            'email' => 'required|max:55',
-            'password' => 'required|min:6|max:15',
+            'roll' => 'required',
+            'address' => 'required',
+            'batch' => 'required',
         ]);
+
+        $data = [
+            'name' => $validatedData['name'],
+            'roll' => $validatedData['roll'],
+            'address' => $validatedData['address'],
+            'batch' => $validatedData['batch'],
+            // Add other fields if necessary
+        ];
+
+        DB::table('studentsinfo')->insert($data);
      
+        return redirect('/')->with('success', 'Added the data to the database');
       
-     
-        return redirect('/');
+       
+}
+
+public function delete($id){  
+    DB::table('studentsinfo')->where('id',$id)->delete();
+    return redirect('/')->with('success', 'Added the data to the database');
+}
+public function edit($id){  
+   $user= DB::table('studentsinfo')->where('id',$id)->first();
+    return view('pages.edit',compact('user'));
+}
+public function update(Request $request,$id){  
+      $validatedData = $request->validate([
+            'name' => 'required',
+            'roll' => 'required',
+            'address' => 'required',
+            'batch' => 'required',
+        ]);
+
+        $data = [
+            'name' => $validatedData['name'],
+            'roll' => $validatedData['roll'],
+            'address' => $validatedData['address'],
+            'batch' => $validatedData['batch'],
+            // Add other fields if necessary
+        ];
+      DB::table('studentsinfo')->where('id',$id)->update($data);
+   return redirect('/')->with('success', 'update the data to the database');
 }
 
 
